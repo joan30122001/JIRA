@@ -2,7 +2,7 @@ name: Build & Push to Docker Hub (CLI)
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main", "master"]
 
 jobs:
   build:

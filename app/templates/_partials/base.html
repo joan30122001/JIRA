@@ -1,0 +1,517 @@
+{% load static %}
+{% load active_link %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Jira & TestLink Manager - Streamline QA and project management">
+    <title>Jira & TestLink Manager | Dashboard</title>
+    
+    <!-- Favicons-->
+    <link rel="shortcut icon" href="https://img.icons8.com/dusk/64/000000/bug.png" type="image/x-icon">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4a6cf7;
+            --secondary: #6c757d;
+            --success: #1dbe72;
+            --danger: #f68e9d;
+            --dark: #1d2a3a;
+            --light: #f8f9fa;
+            --sidebar-width: 260px;
+            --border-radius: 12px;
+            --box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #495057;
+            line-height: 1.6;
+        }
+        
+        .container-fluid {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark);
+            color: white;
+            padding: 25px 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .logo {
+            padding: 0 25px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+        }
+        
+        .logo img {
+            height: 50px;
+            width: auto;
+            margin-bottom: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+        
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+        
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .nav-links i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .welcome h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .welcome p {
+            color: var(--secondary);
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .jira-card {
+            border-top: 4px solid var(--success);
+        }
+        
+        .testlink-card {
+            border-top: 4px solid var(--danger);
+        }
+        
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .jira-card .card-icon {
+            background: rgba(29, 190, 114, 0.1);
+            color: var(--success);
+        }
+        
+        .testlink-card .card-icon {
+            background: rgba(246, 142, 157, 0.1);
+            color: var(--danger);
+        }
+        
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: var(--dark);
+        }
+        
+        .card p {
+            color: var(--secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3b5be3;
+        }
+        
+        /* Activity Section */
+        .activity-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .view-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .activity-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .activity-item {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            background: #f5f7fb;
+            color: var(--primary);
+        }
+        
+        .activity-details {
+            flex: 1;
+        }
+        
+        .activity-details p {
+            margin-bottom: 5px;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: var(--secondary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                align-items: center;
+            }
+            
+            .logo, .nav-links span {
+                display: none;
+            }
+            
+            .nav-links a {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .nav-links i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="https://img.icons8.com/dusk/64/000000/bug.png" alt="Logo">
+                <h3>Jira & TestLink Manager</h3>
+            </div>
+            
+            <ul class="nav-links">
+                <li>
+                    <a href="{% url 'index' %}" class="{% active 'index' %}">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'jira-projects' %}" class="{% active 'jira-projects' %}">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Projects</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'test_cases' %}" class="{% active 'test_cases' %}">
+                        <i class="fas fa-tasks"></i>
+                        <span>Test Cases</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'upload_project_with_steps' %}" class="{% active 'upload_project_with_steps' %}">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Upload</span>
+                    </a>
+                </li>
+                <!-- <li>
+                    <a href="#">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li> -->
+            </ul>
+            
+            <div style="padding: 20px; color: rgba(255,255,255,0.5); font-size: 12px; text-align: center;">
+                &copy; 2024 Jira & TestLink Manager
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="welcome">
+                    <h2>Welcome back, QA Team!</h2>
+                    <p>Manage your Jira projects and TestLink tests from one place</p>
+                </div>
+                
+                <div class="header-actions">
+                    <form action="{% url 'create_project' %}" method="get">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i> New Project
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% block content %}{% endblock %}
+            
+            <!-- Dashboard Cards -->
+            <!-- <div class="dashboard-cards">
+                
+                <div class="card jira-card">
+                    <div class="card-icon">
+                        <i class="fab fa-jira"></i>
+                    </div>
+                    <h3>Create Jira Project</h3>
+                    <p>Automatically create a project in Jira with its test steps from a Word document.</p>
+                    <form action="#" method="get">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> Create Project
+                        </button>
+                    </form>
+                </div>
+                
+                
+                <div class="card testlink-card">
+                    <div class="card-icon">
+                        <i class="fas fa-vial"></i>
+                    </div>
+                    <h3>Run TestLink Tests</h3>
+                    <p>Synchronize your Jira steps in TestLink and automatically run test cases.</p>
+                    <form action="#" method="get">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-play-circle"></i> Launch Tests
+                        </button>
+                    </form>
+                </div>
+            </div> -->
+            
+            <!-- Recent Activity Section -->
+            <!-- <div class="activity-section">
+                <div class="section-header">
+                    <h2>Recent Activity</h2>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                
+                <ul class="activity-list">
+                    <li class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>New project "Authentication Module" created in Jira</p>
+                            <span class="activity-time">2 hours ago</span>
+                        </div>
+                    </li>
+                    
+                    <li class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>Test case "Login functionality" passed in TestLink</p>
+                            <span class="activity-time">Yesterday</span>
+                        </div>
+                    </li>
+                    
+                    <li class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>Project "Payment Gateway" synchronized with TestLink</p>
+                            <span class="activity-time">2 days ago</span>
+                        </div>
+                    </li>
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+    <script>
+        // Simple JavaScript for interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add active class to clicked nav items
+            const navItems = document.querySelectorAll('.nav-links a');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Simulate loading effect for buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 1500);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

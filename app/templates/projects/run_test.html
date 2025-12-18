@@ -1,0 +1,644 @@
+{% extends '_partials/base.html' %}
+{% load static %}
+
+{% block title %}Launch Tests | Jira & TestLink Manager{% endblock %}
+
+{% block content %}
+<div class="test-container">
+    <!-- <div class="test-header">
+        <h2>Launch Tests on TestLink</h2>
+        <p class="subtitle">Select a project to launch the test execution</p>
+    </div> -->
+
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <i class="fas fa-info-circle"></i> {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if projects %}
+    <div class="projects-grid">
+        {% for project in projects %}
+        <div class="project-card">
+            <div class="card-header">
+                <div class="project-icon">
+                    <i class="fab fa-jira"></i>
+                </div>
+                <div class="project-info">
+                    <h3>{{ project.name }}</h3>
+                    <span class="project-key">{{ project.key }}</span>
+                </div>
+                <div class="project-progress">
+                    <div class="progress-percentage" id="percentage-{{ project.key }}">{{ project.percentage }}%</div>
+                    <div class="progress-text">Complete</div>
+                </div>
+            </div>
+            
+            <div class="card-actions">
+                <form method="POST" class="test-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="jira_key" value="{{ project.key }}">
+                    <button type="submit" class="btn-run-test">
+                        <i class="fas fa-play-circle"></i> Run Test
+                    </button>
+                </form>
+
+                <button type="button" class="btn-view-steps" data-project-key="{{ project.key }}">
+                    <i class="fas fa-list-alt"></i> View Steps
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal for steps -->
+        <div id="modal-{{ project.key }}" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Test Steps: {{ project.name }}</h3>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    {% if project.steps %}
+                    <div class="steps-container">
+                        {% for step in project.steps %}
+                        <div class="step-item">
+                            <div class="step-content">
+                                <h6 class="step-title">{{ step.title }}</h6>
+                                {% if step.description %}
+                                <p class="step-description">{{ step.description }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="step-action">
+                                <select name="status_{{ step.id }}" class="status-select" data-project-key="{{ project.key }}">
+                                    <option value="not tested" {% if step.status == "not tested" %}selected{% endif %}>
+                                        🕓 Not tested
+                                    </option>
+                                    <option value="correct" {% if step.status == "correct" %}selected{% endif %}>
+                                        ✅ Correct
+                                    </option>
+                                    <option value="incorrect" {% if step.status == "incorrect" %}selected{% endif %}>
+                                        ❌ Incorrect
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="no-steps">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>No steps found for this project.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Close</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-folder-open"></i>
+        </div>
+        <h3>No projects found</h3>
+        <p>You haven't created any Jira projects yet. Get started by creating your first project.</p>
+        <a href="{% url 'create_project' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Create Your First Project
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .test-container {
+        padding: 25px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .test-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px 0;
+    }
+    
+    .test-header h2 {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .subtitle {
+        color: #666;
+        font-size: 16px;
+        margin: 0;
+    }
+    
+    .messages-container {
+        margin-bottom: 30px;
+    }
+    
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .alert-success {
+        background-color: #e7f6ef;
+        color: #1dbe72;
+        border: 1px solid #b8e6d0;
+    }
+    
+    .alert-error, .alert-danger {
+        background-color: #fde8e8;
+        color: #e53e3e;
+        border: 1px solid #f8c6c6;
+    }
+    
+    .alert-info {
+        background-color: #e1effe;
+        color: #3b82f6;
+        border: 1px solid #c3ddfd;
+    }
+    
+    .alert-warning {
+        background-color: #fef3c7;
+        color: #d97706;
+        border: 1px solid #fcd34d;
+    }
+    
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+    }
+    
+    .project-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-left: 4px solid #4a6cf7;
+    }
+    
+    .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 15px;
+    }
+    
+    .project-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        background: #e1effe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4a6cf7;
+        font-size: 20px;
+    }
+    
+    .project-info {
+        flex: 1;
+    }
+    
+    .project-info h3 {
+        font-size: 18px;
+        margin: 0 0 5px 0;
+        color: #333;
+        font-weight: 600;
+    }
+    
+    .project-key {
+        display: inline-block;
+        background: #f1f8ff;
+        color: #4a6cf7;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .project-progress {
+        text-align: center;
+    }
+    
+    .progress-percentage {
+        font-size: 20px;
+        font-weight: 700;
+        color: #4a6cf7;
+    }
+    
+    .progress-text {
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .card-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    
+    .test-form {
+        flex: 1;
+    }
+    
+    .btn-run-test, .btn-view-steps {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 15px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-run-test {
+        background: #1dbe72;
+        color: white;
+    }
+    
+    .btn-run-test:hover {
+        background: #18a463;
+    }
+    
+    .btn-view-steps {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-view-steps:hover {
+        background: #5a6268;
+    }
+    
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .modal-content {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 0;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 700px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        animation: slideIn 0.3s;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #eaeaea;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        color: #333;
+        font-size: 20px;
+    }
+    
+    .close {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+    .close:hover {
+        color: #333;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .steps-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .step-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        gap: 15px;
+    }
+    
+    .step-content {
+        flex: 1;
+    }
+    
+    .step-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+        margin: 0 0 5px 0;
+    }
+    
+    .step-description {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+    }
+    
+    .step-action {
+        min-width: 150px;
+    }
+    
+    .status-select {
+        width: 100%;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .status-select:focus {
+        outline: none;
+        border-color: #4a6cf7;
+        box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+    }
+    
+    .no-steps {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+    
+    .no-steps i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        color: #ccc;
+    }
+    
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #eaeaea;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .empty-icon {
+        font-size: 64px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        font-size: 20px;
+        color: #333;
+        margin: 0 0 10px 0;
+    }
+    
+    .empty-state p {
+        color: #666;
+        margin: 0 0 25px 0;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        border: none;
+    }
+    
+    .btn-primary {
+        background: #4a6cf7;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #3b5be3;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+    
+    @media (max-width: 768px) {
+        .projects-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 10px;
+        }
+        
+        .card-actions {
+            /* flex-direction: column; */
+            justify-content: space-between;
+        }
+        
+        .step-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .step-action {
+            width: 100%;
+        }
+        
+        .modal-content {
+            width: 95%;
+            margin: 10% auto;
+        }
+    }
+</style>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation to project cards
+        const projectCards = document.querySelectorAll('.project-card');
+        projectCards.forEach((card, index) => {
+            card.style.opacity = "0";
+            card.style.transform = "translateY(20px)";
+            card.style.transition = "all 0.5s ease";
+            
+            setTimeout(() => {
+                card.style.opacity = "1";
+                card.style.transform = "translateY(0)";
+            }, 100 * index);
+        });
+        
+        // Modal functionality
+        const viewStepsButtons = document.querySelectorAll('.btn-view-steps');
+        const modals = document.querySelectorAll('.modal');
+        const closeButtons = document.querySelectorAll('.close, .close-modal');
+        
+        // Open modal when View Steps button is clicked
+        viewStepsButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const projectKey = this.getAttribute('data-project-key');
+                const modal = document.getElementById(`modal-${projectKey}`);
+                if (modal) {
+                    modal.style.display = 'block';
+                }
+            });
+        });
+        
+        // Close modal when X is clicked
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+        
+        // Handle status select changes - CORRIGÉ
+        document.querySelectorAll('select[name^="status_"]').forEach(select => {
+            select.addEventListener("change", function () {
+                const stepId = this.name.split("_")[1];
+                const status = this.value;
+                const projectKey = this.dataset.projectKey;
+
+                fetch("{% url 'update_step_status' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: `step_id=${stepId}&status=${status}`,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert("Erreur lors de l'enregistrement");
+                    } else {
+                        // Mettre à jour le pourcentage de progression
+                        const selects = document.querySelectorAll(`select[data-project-key="${projectKey}"]`);
+                        let total = 0;
+                        let correct = 0;
+
+                        selects.forEach(sel => {
+                            total += 1;
+                            if (sel.value === "correct") correct += 1;
+                        });
+
+                        const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+                        const percentageEl = document.getElementById(`percentage-${projectKey}`);
+                        if (percentageEl) {
+                            percentageEl.textContent = `${percentage}%`;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Erreur:", error);
+                    alert("Erreur lors de l'enregistrement");
+                });
+            });
+        });
+        
+        // Add loading state to run test buttons
+        document.querySelectorAll('.test-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const button = this.querySelector('.btn-run-test');
+                const originalText = button.innerHTML;
+                
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
+                button.disabled = true;
+                
+                // You might want to revert the button state if the form submission fails
+                // This would typically be handled by your Django form validation
+            });
+        });
+    });
+</script>
+{% endblock content %}

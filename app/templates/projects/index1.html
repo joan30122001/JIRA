@@ -1,0 +1,53 @@
+<!-- {% extends '_partials/base.html' %}
+{% load static %}
+
+
+
+{% block title %}Job Application Wizard | Potenza{% endblock %}
+
+{% block content %}
+<div id="container" style="padding: 20px;">
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <div class="container py-5 h-100">
+            <div class="row d-flex align-items-center h-100">
+                
+                <div class="col col-lg-6 mb-4 mb-lg-0">
+                    <figure class="bg-white p-4 rounded shadow-sm" style="border-left: .25rem solid #1dbe72;">
+                        <figcaption class="mb-3">
+                            <h5 class="mb-2">📂 Add a Jira project</h5>
+                            <p class="text-muted mb-3">
+                                Automatically create a project in Jira with its test steps from a Word document.
+                            </p>
+                            <form action="{% url 'create_project' %}" method="get">
+                                <button type="submit" class="btn btn-success" style="background-color: #1dbe72; border: #1dbe72;">
+                                    ➕ Create a project
+                                </button>
+                            </form>
+                        </figcaption>
+                    </figure>
+                </div>
+
+                <div class="col col-lg-6">
+                    <figure class="bg-white p-4 rounded shadow-sm" style="border-left: .25rem solid #f68e9d;">
+                        <figcaption class="mb-3">
+                            <h5 class="mb-2">🚀 Run a TestLink test</h5>
+                            <p class="text-muted mb-3">
+                                Synchronize your Jira steps in TestLink and automatically run test cases.
+                            </p>
+                            <form action="{% url 'test-page' %}" method="get">
+                                <button type="submit" class="btn btn-danger">
+                                    ⚙️ Launch tests
+                                </button>
+                            </form>
+                        </figcaption>
+                    </figure>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+{% endblock content %} -->

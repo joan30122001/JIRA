@@ -1,0 +1,41 @@
+{% extends '_partials/base.html' %}
+{% load static %}
+
+
+<!-- <h2>Upload Steps for {{ project.name }}</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="file" required>
+    <button type="submit">Upload</button>
+</form>
+ -->
+
+
+
+{% block title %}Job Application Wizard | Potenza{% endblock %}
+
+{% block content %}
+<div id="wizard_container">
+    <div id="top-wizard">
+        <span id="location"></span>
+        <div id="progressbar"></div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <h2 class="section_title">Upload Steps for <span style="color: #1dbe72;;">{{ project.name }}</span></h2>
+
+        <div class="form-group add_bottom_30 add_top_20">
+            <label>Upload File<br><small>(Accepted: .doc/docx - Max: 150KB)</small></label>
+            <div class="fileupload">
+                <input type="file" name="file" accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="required">
+            </div>
+        </div>
+
+        <div id="bottom-wizard">
+            <button type="submit" class="btn" style="background-color: #1dbe72; color: #fff;">Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

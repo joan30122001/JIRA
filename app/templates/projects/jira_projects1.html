@@ -1,0 +1,54 @@
+{% extends '_partials/base.html' %}
+{% load static %}
+
+
+
+{% block title %}Job Application Wizard | Potenza{% endblock %}
+
+{% block content %}
+
+<div id="container">
+    <div id="top-wizard">
+        <span id="location"></span>
+        <div id="progressbar"></div>
+
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+        <h2 class="section_title" style="margin: 0px;">My Jira Projects</h2>
+        
+        <a href="{% url 'create_project' %}">
+            <button class="btn" style="background-color: #1dbe72; color: #fff; padding: 10px 20px; border: none; border-radius: 5px;">
+                📂 Create a Projects
+            </button>
+        </a>
+    </div>
+
+    <div style="display: flex; gap: 15px; align-items: center;">
+        
+        <div class="container py-5 h-100">
+            <div class="row d-flex align-items-center h-100">
+
+                {% for project in projects %}
+                    
+                    <div class="col col-lg-6 mb-4 mb-lg-0">
+                        <figure class="bg-white p-4 rounded shadow-sm" style="border-left: .25rem solid #1dbe72;">
+                            <figcaption class="mb-3">
+                                <h5 class="mb-4"> {{ project.name }} ({{ project.key }})</h5>
+                                
+                                <a href="{{ project.url }}" target="_blank">🔗 Ouvrir dans Jira</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                {% empty %}
+                    <li>Aucun projet trouvé.</li>
+                {% endfor %}
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+{% endblock content %}

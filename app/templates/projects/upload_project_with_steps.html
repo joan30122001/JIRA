@@ -1,0 +1,404 @@
+{% extends '_partials/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="upload-container">
+    <div class="upload-card">
+        <div class="upload-header">
+            <div class="upload-icon">
+                <i class="fas fa-file-word"></i>
+            </div>
+            <h2>Upload Project Document</h2>
+            <p>Select a Word document (.docx) to create a new Jira project with test steps</p>
+        </div>
+
+        <form method="post" 
+              enctype="multipart/form-data" 
+              action="{% url 'upload_project_with_steps' %}" 
+              id="upload-form"
+              class="upload-form">
+            {% csrf_token %}
+            
+            <div class="file-upload-wrapper">
+                <input type="file" name="file" id="file" accept=".docx" required>
+                <label for="file" class="file-upload-label">
+                    <div class="file-upload-area">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h4>Drag & Drop your file here</h4>
+                        <p>or click to browse</p>
+                        <span class="file-types">Supported format: .docx</span>
+                    </div>
+                </label>
+                <div id="file-info" class="file-info">
+                    <span class="file-name">No file selected</span>
+                    <button type="button" class="file-remove" id="file-remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="upload-actions">
+                <button type="submit" class="btn-upload" id="submit-btn">
+                    <i class="fas fa-upload"></i> Upload Document
+                </button>
+                <div id="upload-status" class="upload-status">
+                    <div class="upload-progress">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <span class="status-text">Processing your document...</span>
+                </div>
+            </div>
+        </form>
+
+        <div class="upload-features">
+            <h4>What happens next?</h4>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Your document will be processed automatically</li>
+                <li><i class="fas fa-check-circle"></i> A new Jira project will be created</li>
+                <li><i class="fas fa-check-circle"></i> Test steps will be extracted and organized</li>
+                <li><i class="fas fa-check-circle"></i> You'll be redirected to the project page</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .upload-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 20px;
+        background-color: #f5f7fb;
+    }
+    
+    .upload-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        width: 100%;
+        max-width: 650px;
+    }
+    
+    .upload-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .upload-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: #e1effe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: #4a6cf7;
+        font-size: 28px;
+    }
+    
+    .upload-header h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .upload-header p {
+        color: #666;
+        margin: 0;
+    }
+    
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 25px;
+    }
+    
+    #file {
+        position: absolute;
+        left: -9999px;
+    }
+    
+    .file-upload-label {
+        display: block;
+        cursor: pointer;
+    }
+    
+    .file-upload-area {
+        border: 2px dashed #d1d8e0;
+        border-radius: 12px;
+        padding: 40px 20px;
+        text-align: center;
+        transition: all 0.3s;
+        background: #fafbfc;
+    }
+    
+    .file-upload-area:hover {
+        border-color: #4a6cf7;
+        background: #f5f9ff;
+    }
+    
+    .file-upload-area i {
+        font-size: 48px;
+        color: #4a6cf7;
+        margin-bottom: 15px;
+    }
+    
+    .file-upload-area h4 {
+        font-size: 18px;
+        margin: 0 0 10px;
+        color: #333;
+    }
+    
+    .file-upload-area p {
+        color: #666;
+        margin: 0 0 10px;
+    }
+    
+    .file-types {
+        font-size: 12px;
+        color: #888;
+    }
+    
+    .file-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 15px;
+        padding: 12px 15px;
+        background: #f3f6ff;
+        border-radius: 8px;
+        display: none;
+    }
+    
+    .file-name {
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .file-remove {
+        background: none;
+        border: none;
+        color: #888;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    
+    .file-remove:hover {
+        color: #e53e3e;
+        background: #fee;
+    }
+    
+    .upload-actions {
+        margin-top: 30px;
+    }
+    
+    .btn-upload {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #4a6cf7;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-upload:hover {
+        background: #3b5be3;
+    }
+    
+    .btn-upload:disabled {
+        background: #a0aec0;
+        cursor: not-allowed;
+    }
+    
+    .upload-status {
+        display: none;
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .upload-progress {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        width: 0%;
+        background: #4a6cf7;
+        border-radius: 3px;
+        transition: width 0.3s;
+    }
+    
+    .status-text {
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .upload-features {
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 1px solid #eaeaea;
+    }
+    
+    .upload-features h4 {
+        font-size: 16px;
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .upload-features ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .upload-features li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        color: #555;
+    }
+    
+    .upload-features li i {
+        color: #1dbe72;
+    }
+    
+    @media (max-width: 768px) {
+        .upload-card {
+            padding: 20px;
+        }
+        
+        .file-upload-area {
+            padding: 30px 15px;
+        }
+        
+        .file-upload-area h4 {
+            font-size: 16px;
+        }
+    }
+</style>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('file');
+        const fileInfo = document.getElementById('file-info');
+        const fileName = document.querySelector('.file-name');
+        const fileRemove = document.getElementById('file-remove');
+        const uploadForm = document.getElementById('upload-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const uploadStatus = document.getElementById('upload-status');
+        const progressBar = document.querySelector('.progress-bar');
+        
+        // Handle file selection
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                const file = this.files[0];
+                fileName.textContent = file.name;
+                fileInfo.style.display = 'flex';
+            } else {
+                fileInfo.style.display = 'none';
+            }
+        });
+        
+        // Handle file removal
+        fileRemove.addEventListener('click', function() {
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+        });
+        
+        // Handle form submission
+        uploadForm.addEventListener('submit', function(e) {
+            if (fileInput.files.length === 0) {
+                e.preventDefault();
+                alert('Please select a file to upload.');
+                return;
+            }
+            
+            // Disable button and show status
+            submitBtn.disabled = true;
+            uploadStatus.style.display = 'block';
+            
+            // Simulate progress (in a real scenario, you'd use AJAX with progress events)
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = progress + '%';
+                
+                if (progress >= 90) {
+                    clearInterval(interval);
+                }
+            }, 200);
+        });
+        
+        // Drag and drop functionality
+        const dropArea = document.querySelector('.file-upload-area');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropArea.style.borderColor = '#4a6cf7';
+            dropArea.style.backgroundColor = '#f0f5ff';
+        }
+        
+        function unhighlight() {
+            dropArea.style.borderColor = '#d1d8e0';
+            dropArea.style.backgroundColor = '#fafbfc';
+        }
+        
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                fileInput.files = files;
+                const file = files[0];
+                
+                // Check if file is .docx
+                if (!file.name.endsWith('.docx')) {
+                    alert('Please select a .docx file');
+                    return;
+                }
+                
+                fileName.textContent = file.name;
+                fileInfo.style.display = 'flex';
+            }
+        }
+    });
+</script>
+{% endblock %}

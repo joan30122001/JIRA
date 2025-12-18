@@ -1,0 +1,419 @@
+{% extends '_partials/base.html' %}
+{% load static %}
+
+{% block title %}Test Cases | Jira & TestLink Manager{% endblock %}
+
+{% block content %}
+<div class="test-cases-container">
+    <!-- <div class="page-header">
+        <h2>Test Cases Management</h2>
+        <p class="subtitle">View and manage test cases for all projects</p>
+    </div> -->
+
+    {% if projects %}
+    <div class="projects-accordion">
+        {% for project in projects %}
+        <div class="project-item">
+            <div class="project-header" data-project-id="{{ project.id }}">
+                <div class="project-info">
+                    <h3>{{ project.name }} ({{ project.key }})</h3>
+                    <span class="project-progress">{{ project.percentage }}% Complete</span>
+                </div>
+                <div class="project-actions">
+                    <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+            </div>
+            
+            <div class="project-steps-container">
+                <div class="steps-header">
+                    <span class="step-title-header">Test Steps</span>
+                    <span class="step-status-header">Status</span>
+                </div>
+                
+                {% if project.steps %}
+                <div class="steps-list">
+                    {% for step in project.steps %}
+                    <div class="step-item">
+                        <div class="step-content">
+                            <div class="step-number">{{ forloop.counter }}.</div>
+                            <div class="step-details">
+                                <h4 class="step-title">{{ step.title }}</h4>
+                                {% if step.description %}
+                                <p class="step-description">{{ step.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="step-status">
+                            <select name="status_{{ step.id }}" class="status-select" data-project-key="{{ project.key }}">
+                                <option value="not tested" {% if step.status == "not tested" %}selected{% endif %}>
+                                    🕓 Not tested
+                                </option>
+                                <option value="correct" {% if step.status == "correct" %}selected{% endif %}>
+                                    ✅ Correct
+                                </option>
+                                <option value="incorrect" {% if step.status == "incorrect" %}selected{% endif %}>
+                                    ❌ Incorrect
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-steps">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>No test steps found for this project.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-folder-open"></i>
+        </div>
+        <h3>No projects found</h3>
+        <p>You haven't created any Jira projects yet. Get started by creating your first project.</p>
+        <a href="{% url 'create_project' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Create Your First Project
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .test-cases-container {
+        padding: 25px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    
+    .page-header h2 {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .subtitle {
+        color: #666;
+        font-size: 16px;
+        margin: 0;
+    }
+    
+    .projects-accordion {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .project-item {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    
+    .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .project-header:hover {
+        background: #e9ecef;
+    }
+    
+    .project-info h3 {
+        font-size: 18px;
+        margin: 0 0 5px 0;
+        color: #333;
+        font-weight: 600;
+    }
+    
+    .project-progress {
+        display: inline-block;
+        background: #e1effe;
+        color: #4a6cf7;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .toggle-icon {
+        color: #6c757d;
+        transition: transform 0.3s;
+    }
+    
+    .project-header.active .toggle-icon {
+        transform: rotate(180deg);
+    }
+    
+    .project-steps-container {
+        display: none;
+        padding: 0;
+    }
+    
+    .project-header.active + .project-steps-container {
+        display: block;
+    }
+    
+    .steps-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eaeaea;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .step-title-header {
+        flex: 1;
+    }
+    
+    .step-status-header {
+        width: 150px;
+        text-align: center;
+    }
+    
+    .steps-list {
+        padding: 0;
+    }
+    
+    .step-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .step-item:last-child {
+        border-bottom: none;
+    }
+    
+    .step-content {
+        display: flex;
+        align-items: flex-start;
+        flex: 1;
+        gap: 15px;
+    }
+    
+    .step-number {
+        background: #4a6cf7;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+    
+    .step-details {
+        flex: 1;
+    }
+    
+    .step-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+        margin: 0 0 5px 0;
+    }
+    
+    .step-description {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+    }
+    
+    .step-status {
+        width: 150px;
+    }
+    
+    .status-select {
+        width: 100%;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .status-select:focus {
+        outline: none;
+        border-color: #4a6cf7;
+        box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+    }
+    
+    .no-steps {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+    
+    .no-steps i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        color: #ccc;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .empty-icon {
+        font-size: 64px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        font-size: 20px;
+        color: #333;
+        margin: 0 0 10px 0;
+    }
+    
+    .empty-state p {
+        color: #666;
+        margin: 0 0 25px 0;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        border: none;
+    }
+    
+    .btn-primary {
+        background: #4a6cf7;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #3b5be3;
+    }
+    
+    @media (max-width: 768px) {
+        .step-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .step-status {
+            width: 100%;
+        }
+        
+        .steps-header {
+            display: none;
+        }
+        
+        .step-content {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Accordion functionality for projects
+        const projectHeaders = document.querySelectorAll('.project-header');
+        
+        projectHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+            
+            // Open first project by default
+            if (window.innerWidth > 768) {
+                header.classList.add('active');
+            }
+        });
+        
+        // Handle status select changes
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener("change", function () {
+                const stepId = this.name.split("_")[1];
+                const status = this.value;
+                const projectKey = this.dataset.projectKey;
+
+                fetch("{% url 'update_step_status' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: `step_id=${stepId}&status=${status}`,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert("Error saving status");
+                    } else {
+                        // Update progress percentage for the project
+                        const projectHeader = this.closest('.project-item').querySelector('.project-header');
+                        const projectId = projectHeader.dataset.projectId;
+                        const selects = document.querySelectorAll(`.project-item[data-project-id="${projectId}"] .status-select`);
+                        
+                        let total = 0;
+                        let correct = 0;
+
+                        selects.forEach(sel => {
+                            total += 1;
+                            if (sel.value === "correct") correct += 1;
+                        });
+
+                        const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+                        const progressElement = projectHeader.querySelector('.project-progress');
+                        
+                        if (progressElement) {
+                            progressElement.textContent = `${percentage}% Complete`;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Error saving status");
+                });
+            });
+        });
+    });
+</script>
+{% endblock content %}

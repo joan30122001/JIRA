@@ -1,0 +1,848 @@
+{% extends '_partials/base.html' %}
+{% load static %}
+
+{% block title %}My Jira Projects | Jira & TestLink Manager{% endblock %}
+
+{% block content %}
+<div class="projects-container">
+    <!-- <div class="projects-header">
+        <h2>My Jira Projects</h2>
+        <a href="{% url 'create_project' %}" class="create-btn">
+            <i class="fas fa-plus-circle"></i> Create Project
+        </a>
+    </div> -->
+
+    {% if projects %}
+    <div class="projects-grid">
+        {% for project in projects %}
+        <div class="project-card">
+            <div class="project-icon">
+                <i class="fab fa-jira"></i>
+            </div>
+            <div class="project-details">
+                <h3>{{ project.name }}</h3>
+                <span class="project-key">{{ project.key }}</span>
+            </div>
+            <div class="project-actions">
+                <a href="{{ project.url }}" target="_blank" class="project-link">
+                    <i class="fas fa-external-link-alt"></i> Open in Jira
+                </a>
+                <button class="upload-btn" data-project-id="{{ project.id }}" data-project-name="{{ project.name }}">
+                    <i class="fas fa-upload"></i> Upload Steps
+                </button>
+                <button class="detail-btn" data-project-id="{{ project.id }}" data-project-name="{{ project.name }}" data-project-key="{{ project.key }}" data-project-url="{{ project.url }}">
+                    <i class="fas fa-eye"></i> View Details
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-folder-open"></i>
+        </div>
+        <h3>No projects found</h3>
+        <p>You haven't created any Jira projects yet. Get started by creating your first project.</p>
+        <a href="{% url 'create_project' %}" class="create-btn">
+            <i class="fas fa-plus-circle"></i> Create Your First Project
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal for Upload Steps -->
+<div id="uploadModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Upload Steps for <span id="modal-project-name"></span></h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form method="post" enctype="multipart/form-data" id="uploadForm">
+                {% csrf_token %}
+                <input type="hidden" name="project_id" id="projectId">
+                
+                <div class="form-group">
+                    <label>Upload File<br><small>(Accepted: .doc/docx - Max: 150KB)</small></label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" name="file" id="fileInput" 
+                               accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+                               class="required" required>
+                        <label for="fileInput" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Choose a file</span>
+                        </label>
+                        <div id="fileName" class="file-name">No file chosen</div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-upload"></i> Upload File
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Project Details -->
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Project Details: <span id="detail-project-name"></span></h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="project-info">
+                <div class="info-item">
+                    <label>Project Name:</label>
+                    <span id="detail-name">{{ project.name }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Project Key:</label>
+                    <span id="detail-key" class="project-key-badge"></span>
+                </div>
+                <div class="info-item">
+                    <label>Project Description:</label>
+                    <span id="detail-description" class="project-description"></span>
+                </div>
+                <div class="info-item">
+                    <label>Jira URL:</label>
+                    <a href="#" id="detail-url" target="_blank" class="project-url"></a>
+                </div>
+                <div class="info-item">
+                    <label>Status:</label>
+                    <span class="status-badge active">Active</span>
+                </div>
+                <div class="info-item">
+                    <label>Created:</label>
+                    <span id="detail-created">Just now</span>
+                </div>
+            </div>
+            
+            <div class="project-stats">
+                <h4>Statistics</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Test Cases</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Passed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recent-activity">
+                <h4>Recent Activity</h4>
+                <ul class="activity-list">
+                    <li class="activity-item">
+                        <i class="fas fa-plus-circle activity-icon"></i>
+                        <div class="activity-content">
+                            <p>Project created in Jira</p>
+                            <span class="activity-time">Just now</span>
+                        </div>
+                    </li>
+                    <li class="activity-item">
+                        <i class="fas fa-sync-alt activity-icon"></i>
+                        <div class="activity-content">
+                            <p>Synchronized with TestLink</p>
+                            <span class="activity-time">5 minutes ago</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" id="detail-jira-link" class="btn btn-primary" target="_blank">
+                <i class="fab fa-jira"></i> Open in Jira
+            </a>
+            <button class="btn btn-secondary close-detail">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .projects-container {
+        padding: 25px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .projects-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    
+    .projects-header h2 {
+        font-size: 24px;
+        color: #333;
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .create-btn {
+        background-color: #1dbe72;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    
+    .create-btn:hover {
+        background-color: #18a463;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+    }
+    
+    .project-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+        border-left: 4px solid #1dbe72;
+    }
+    
+    .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    .project-icon {
+        font-size: 24px;
+        color: #1dbe72;
+        margin-bottom: 15px;
+    }
+    
+    .project-details h3 {
+        font-size: 18px;
+        margin: 0 0 8px 0;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .project-details {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .project-key {
+        display: inline-block;
+        background: #f1f8ff;
+        color: #1dbe72;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    
+    .project-description {
+        color: #666;
+        margin: 0 0 15px 0;
+        font-size: 14px;
+    }
+    
+    .project-actions {
+        margin-top: auto;
+        display: flex;
+        /* flex-direction: column; */
+        gap: 10px;
+        justify-content: space-between;
+    }
+    
+    .project-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #4a6cf7;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+        padding: 8px 12px;
+        border: 1px solid #4a6cf7;
+        border-radius: 6px;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .project-link:hover {
+        background-color: #4a6cf7;
+        color: white;
+    }
+    
+    .upload-btn, .detail-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .upload-btn {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .upload-btn:hover {
+        background-color: #5a6268;
+    }
+    
+    .detail-btn {
+        background-color: #4a6cf7;
+        color: white;
+    }
+    
+    .detail-btn:hover {
+        background-color: #3b5be3;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .empty-icon {
+        font-size: 64px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        font-size: 20px;
+        color: #333;
+        margin: 0 0 10px 0;
+    }
+    
+    .empty-state p {
+        color: #666;
+        margin: 0 0 25px 0;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .modal-content {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 0;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 700px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        animation: slideIn 0.3s;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #eaeaea;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        color: #333;
+        font-size: 20px;
+    }
+    
+    .close {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+    .close:hover {
+        color: #333;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 15px;
+    }
+    
+    #fileInput {
+        position: absolute;
+        left: -9999px;
+    }
+    
+    .file-upload-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .file-upload-label:hover {
+        border-color: #1dbe72;
+        background-color: #f5f5f5;
+    }
+    
+    .file-upload-label i {
+        font-size: 32px;
+        color: #1dbe72;
+        margin-bottom: 10px;
+    }
+    
+    .file-upload-label span {
+        color: #666;
+    }
+    
+    .file-name {
+        text-align: center;
+        margin-top: 10px;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .form-actions {
+        text-align: right;
+    }
+    
+    .submit-btn {
+        background-color: #1dbe72;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .submit-btn:hover {
+        background-color: #18a463;
+    }
+    
+    /* Detail Modal Styles */
+    .project-info {
+        margin-bottom: 25px;
+    }
+    
+    .info-item {
+        display: flex;
+        margin-bottom: 15px;
+        align-items: center;
+    }
+    
+    .info-item label {
+        font-weight: 600;
+        width: 120px;
+        color: #555;
+    }
+    
+    .info-item span, .info-item a {
+        flex: 1;
+    }
+    
+    .project-key-badge {
+        display: inline-block;
+        background: #f1f8ff;
+        color: #1dbe72;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .project-url {
+        color: #4a6cf7;
+        text-decoration: none;
+    }
+    
+    .project-url:hover {
+        text-decoration: underline;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .status-badge.active {
+        background: #e7f6ef;
+        color: #1dbe72;
+    }
+    
+    .project-stats {
+        margin-bottom: 25px;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 8px;
+    }
+    
+    .project-stats h4 {
+        margin: 0 0 15px 0;
+        color: #333;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #4a6cf7;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .recent-activity h4 {
+        margin: 0 0 15px 0;
+        color: #333;
+    }
+    
+    .activity-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .activity-item {
+        display: flex;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-icon {
+        margin-right: 15px;
+        color: #4a6cf7;
+        font-size: 16px;
+    }
+    
+    .activity-content p {
+        margin: 0 0 5px 0;
+        color: #333;
+    }
+    
+    .activity-time {
+        font-size: 12px;
+        color: #888;
+    }
+    
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #eaeaea;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        border: none;
+    }
+    
+    .btn-primary {
+        background: #4a6cf7;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #3b5be3;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+    
+    @media (max-width: 768px) {
+        .projects-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .projects-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .modal-content {
+            width: 95%;
+            margin: 10% auto;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .info-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .info-item label {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        
+        .modal-footer {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get modal elements
+        const uploadModal = document.getElementById('uploadModal');
+        const detailModal = document.getElementById('detailModal');
+        const uploadBtns = document.querySelectorAll('.upload-btn');
+        const detailBtns = document.querySelectorAll('.detail-btn');
+        const closeBtns = document.querySelectorAll('.close');
+        const closeDetailBtn = document.querySelector('.close-detail');
+        const projectNameSpan = document.getElementById('modal-project-name');
+        const projectIdInput = document.getElementById('projectId');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        
+        // Detail modal elements
+        const detailProjectName = document.getElementById('detail-project-name');
+        const detailName = document.getElementById('detail-name');
+        const detailKey = document.getElementById('detail-key');
+        const detailUrl = document.getElementById('detail-url');
+        const detailJiraLink = document.getElementById('detail-jira-link');
+        
+        // Add animation to project cards
+        const projectCards = document.querySelectorAll('.project-card');
+        projectCards.forEach((card, index) => {
+            card.style.opacity = "0";
+            card.style.transform = "translateY(20px)";
+            card.style.transition = "all 0.5s ease";
+            
+            setTimeout(() => {
+                card.style.opacity = "1";
+                card.style.transform = "translateY(0)";
+            }, 100 * index);
+        });
+        
+        // Open upload modal when upload button is clicked
+        uploadBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const projectId = this.getAttribute('data-project-id');
+                const projectName = this.getAttribute('data-project-name');
+                
+                projectNameSpan.textContent = projectName;
+                projectIdInput.value = projectId;
+                
+                uploadModal.style.display = 'block';
+            });
+        });
+        
+        // Open detail modal when detail button is clicked
+        detailBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const projectId = this.getAttribute('data-project-id');
+                const projectName = this.getAttribute('data-project-name');
+                const projectKey = this.getAttribute('data-project-key');
+                const projectUrl = this.getAttribute('data-project-url');
+                
+                // Set values in detail modal
+                detailProjectName.textContent = projectName;
+                detailName.textContent = projectName;
+                detailKey.textContent = projectKey;
+                detailUrl.textContent = projectUrl;
+                detailUrl.href = projectUrl;
+                detailJiraLink.href = projectUrl;
+                
+                detailModal.style.display = 'block';
+            });
+        });
+        
+        // Close modals when X is clicked
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                uploadModal.style.display = 'none';
+                detailModal.style.display = 'none';
+            });
+        });
+        
+        // Close detail modal with button
+        if (closeDetailBtn) {
+            closeDetailBtn.addEventListener('click', function() {
+                detailModal.style.display = 'none';
+            });
+        }
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === uploadModal) {
+                uploadModal.style.display = 'none';
+            }
+            if (event.target === detailModal) {
+                detailModal.style.display = 'none';
+            }
+        });
+        
+        // Update file name when a file is selected
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    fileName.textContent = this.files[0].name;
+                } else {
+                    fileName.textContent = 'No file chosen';
+                }
+            });
+        }
+        
+        // Handle form submission
+        const uploadForm = document.getElementById('uploadForm');
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function(e) {
+                // You can add validation here if needed
+                // For example, check if a file is selected
+                if (fileInput.files.length === 0) {
+                    e.preventDefault();
+                    alert('Please select a file to upload.');
+                    return;
+                }
+                
+                // Show loading state
+                const submitBtn = this.querySelector('.submit-btn');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+                submitBtn.disabled = true;
+                
+                // You might want to revert the button state if the form submission fails
+                // This would typically be handled by your Django form validation
+            });
+        }
+    });
+</script>
+{% endblock content %}

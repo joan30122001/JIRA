@@ -13,8 +13,6 @@
 #       - .env
 
 
-version: "3.9"
-
 services:
   web:
     image: joan30122001/jira:latest
@@ -30,7 +28,7 @@ services:
     restart: unless-stopped
 
   testlink_db:
-    image: bitnami/mariadb:11
+    image: bitnami/mariadb:latest
     container_name: testlink-db
     environment:
       - MARIADB_ROOT_PASSWORD=${TESTLINK_DB_ROOT_PASSWORD}

@@ -1,13 +1,62 @@
+# version: "3.9"
+
+# services:
+#   web:
+#     build: .
+#     container_name: django-app
+#     command: python manage.py runserver 0.0.0.0:8000
+#     ports:
+#       - "8000:8000"
+#     volumes:
+#       - .:/app
+#     env_file:
+#       - .env
+
+
 version: "3.9"
 
 services:
   web:
-    build: .
+    image: joan30122001/jira:latest
     container_name: django-app
-    command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app
     env_file:
       - .env
+    environment:
+      - TESTLINK_URL=http://testlink:8080
+    depends_on:
+      - testlink
+    restart: unless-stopped
+
+  testlink_db:
+    image: bitnami/mariadb:11
+    container_name: testlink-db
+    environment:
+      - MARIADB_ROOT_PASSWORD=${TESTLINK_DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${TESTLINK_DB_NAME}
+      - MARIADB_USER=${TESTLINK_DB_USER}
+      - MARIADB_PASSWORD=${TESTLINK_DB_PASSWORD}
+    volumes:
+      - testlink_db_data:/bitnami/mariadb
+    restart: unless-stopped
+
+  testlink:
+    image: bitnami/testlink:latest
+    container_name: testlink
+    ports:
+      - "8085:8080"
+    environment:
+      - TESTLINK_DATABASE_HOST=testlink_db
+      - TESTLINK_DATABASE_NAME=${TESTLINK_DB_NAME}
+      - TESTLINK_DATABASE_USER=${TESTLINK_DB_USER}
+      - TESTLINK_DATABASE_PASSWORD=${TESTLINK_DB_PASSWORD}
+    depends_on:
+      - testlink_db
+    volumes:
+      - testlink_data:/bitnami/testlink
+    restart: unless-stopped
+
+volumes:
+  testlink_db_data:
+  testlink_data:

@@ -51,7 +51,10 @@ services:
       - DB_PASS=${TESTLINK_DB_PASSWORD}
     depends_on:
       - testlink_db
+    volumes:
+      - testlink_data:/var/testlink
     restart: unless-stopped
 
 volumes:
   testlink_db_data:
+  testlink_data:

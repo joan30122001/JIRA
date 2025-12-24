@@ -27,7 +27,7 @@ services:
       - testlink
     restart: unless-stopped
 
-  testlink_db:
+  testlinkdb:
     image: mariadb:10.11
     container_name: testlink-db
     environment:
@@ -45,12 +45,12 @@ services:
     ports:
       - "8085:80"
     environment:
-      - DB_HOST=testlink_db
+      - DB_HOST=testlinkdb
       - DB_NAME=${TESTLINK_DB_NAME}
       - DB_USER=${TESTLINK_DB_USER}
       - DB_PASS=${TESTLINK_DB_PASSWORD}
     depends_on:
-      - testlink_db
+      - testlinkdb
     volumes:
       - testlink_data:/var/testlink
     restart: unless-stopped

@@ -22,3 +22,21 @@ class Step(models.Model):
 
     def __str__(self):
         return self.title
+
+
+
+class AsanaProject(models.Model):
+    gid = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=255, blank=True)
+    permalink_url = models.URLField(blank=True)
+    workspace_name = models.CharField(max_length=255, blank=True)
+    team_name = models.CharField(max_length=255, blank=True)
+    archived = models.BooleanField(default=False)
+    privacy_setting = models.CharField(max_length=50, blank=True)
+    synced_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-synced_at", "name"]
+
+    def __str__(self):
+        return f"{self.name} ({self.gid})"

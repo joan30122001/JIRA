@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Result</title>
+</head>
+<body>
+    <h1>Add Result for Run {{ run_id }} / Case {{ case_id }}</h1>
+
+    {% if success %}<p style="color:green;">{{ success }}</p>{% endif %}
+    {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+
+    <form method="post" action="{{ action_url }}">
+        {% csrf_token %}
+        <p><input type="number" name="status_id" placeholder="Status ID" required></p>
+        <p><textarea name="comment" placeholder="Comment"></textarea></p>
+        <p><input type="text" name="version" placeholder="Version"></p>
+        <p><input type="text" name="defects" placeholder="Defects"></p>
+        <p><input type="text" name="elapsed" placeholder="Elapsed (ex: 30s, 5m)"></p>
+        <button type="submit">Add Result</button>
+    </form>
+
+    {% if result %}<pre>{{ result }}</pre>{% endif %}
+</body>
+</html>

@@ -339,6 +339,71 @@
                 align-items: flex-start;
             }
         }
+
+
+
+
+
+
+
+        /* Submenu Styles */
+        .has-submenu {
+            position: relative;
+        }
+
+        .submenu-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .submenu-arrow {
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .has-submenu.active .submenu-arrow {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            list-style: none;
+            padding-left: 45px;
+            margin: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .has-submenu.active .submenu {
+            max-height: 300px;
+        }
+
+        .submenu li {
+            margin: 5px 0;
+        }
+
+        .submenu li a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 6px;
+        }
+
+        .submenu li a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .submenu li a i {
+            font-size: 14px;
+            width: 20px;
+        }
     </style>
 </head>
 <body>
@@ -374,6 +439,49 @@
                         <i class="fas fa-chart-line"></i>
                         <span>Upload</span>
                     </a>
+                </li>
+                <!-- <li>
+                    <a href="{% url 'upload_project_with_steps' %}" class="{% active 'upload_project_with_steps' %}">
+                        <i class="fas fa-tools"></i>
+                        <span>TestRail</span>
+                    </a>
+                </li> -->
+                <li class="has-submenu">
+                    <a href="javascript:void(0);" class="submenu-trigger">
+                        <i class="fas fa-tools"></i>
+                        <span>TestRail</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <!-- <li>
+                            <a href="{% url 'upload_project_with_steps' %}" class="{% active 'upload_project_with_steps' %}">
+                                <i class="fas fa-upload"></i>
+                                <span>Upload Test Cases</span>
+                            </a>
+                        </li> -->
+                        <li>
+                            <a href="{% url 'testrail_projects' %}" class="{% active 'testrail_projects' %}">
+                                <i class="fas fa-project-diagram"></i>
+                                <span>TestRail Projects</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'testrail_create_project' %}" class="{% active 'testrail_create_project' %}">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Create Project</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'testrail_statuses' %}" class="{% active 'testrail_statuses' %}">
+                                <i class="fas fa-cog"></i>
+                                <span>Configuration</span>
+                            </a>
+                        </li>
+                        
+                        
+                        
+                        
+                    </ul>
                 </li>
                 <!-- <li>
                     <a href="#">
@@ -512,6 +620,32 @@
                 });
             });
         });
+    </script>
+
+
+
+    <script>
+        // Submenu toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const submenuTriggers = document.querySelectorAll('.submenu-trigger');
+    
+    submenuTriggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            const parentLi = this.closest('.has-submenu');
+            parentLi.classList.toggle('active');
+        });
+    });
+    
+    // Keep submenu open if a child link is active
+    const activeSubmenuItem = document.querySelector('.submenu li a.active');
+    if (activeSubmenuItem) {
+        const parentSubmenu = activeSubmenuItem.closest('.has-submenu');
+        if (parentSubmenu) {
+            parentSubmenu.classList.add('active');
+        }
+    }
+});
     </script>
 </body>
 </html>

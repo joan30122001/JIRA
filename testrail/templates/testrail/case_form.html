@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Case</title>
+</head>
+<body>
+    <h1>Create Case for Section {{ section_id }}</h1>
+
+    {% if success %}<p style="color:green;">{{ success }}</p>{% endif %}
+    {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+
+    <form method="post" action="{{ action_url }}">
+        {% csrf_token %}
+        <p><input type="text" name="title" placeholder="Case title" required></p>
+        <p><textarea name="steps" placeholder="Steps"></textarea></p>
+        <p><textarea name="expected" placeholder="Expected result"></textarea></p>
+        <p><input type="text" name="refs" placeholder="Refs"></p>
+        <p><input type="number" name="priority_id" placeholder="Priority ID"></p>
+        <button type="submit">Create Case</button>
+    </form>
+
+    {% if result %}<pre>{{ result }}</pre>{% endif %}
+</body>
+</html>

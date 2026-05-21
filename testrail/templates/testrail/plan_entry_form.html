@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Plan Entry</title>
+</head>
+<body>
+    <h1>Add Plan Entry for Plan {{ plan_id }}</h1>
+
+    {% if success %}<p style="color:green;">{{ success }}</p>{% endif %}
+    {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+
+    <form method="post" action="{{ action_url }}">
+        {% csrf_token %}
+        <p><input type="number" name="suite_id" placeholder="Suite ID" required></p>
+        <p><input type="text" name="name" placeholder="Entry name" required></p>
+        <p><textarea name="description" placeholder="Description"></textarea></p>
+        <p>
+            <label>Include all</label>
+            <input type="checkbox" name="include_all" checked>
+        </p>
+        <p><input type="text" name="case_ids" placeholder="Case IDs comma separated"></p>
+        <p><input type="number" name="milestone_id" placeholder="Milestone ID"></p>
+        <button type="submit">Add Plan Entry</button>
+    </form>
+
+    {% if result %}<pre>{{ result }}</pre>{% endif %}
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Bulk Results</title>
+</head>
+<body>
+    <h1>Add Bulk Results to Run {{ run_id }}</h1>
+
+    {% if success %}<p style="color:green;">{{ success }}</p>{% endif %}
+    {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+
+    <form method="post" action="{{ action_url }}">
+        {% csrf_token %}
+        <p>
+            <textarea name="results_json" rows="12" cols="80" placeholder='[{"case_id":52,"status_id":1,"comment":"Passed"}]'></textarea>
+        </p>
+        <button type="submit">Add Bulk Results</button>
+    </form>
+
+    {% if result %}<pre>{{ result }}</pre>{% endif %}
+</body>
+</html>

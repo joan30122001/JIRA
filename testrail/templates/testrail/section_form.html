@@ -1,0 +1,360 @@
+{% extends '_partials/base.html' %}
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Create Section</title>
+</head>
+<body>
+    <h1>Create Section for Project {{ project_id }}</h1>
+
+    {% if success %}<p style="color:green;">{{ success }}</p>{% endif %}
+    {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+
+    <form method="post" action="{{ action_url }}">
+        {% csrf_token %}
+        <p><input type="text" name="name" placeholder="Section name" required></p>
+        <p><textarea name="description" placeholder="Description"></textarea></p>
+        <p><input type="number" name="suite_id" placeholder="Suite ID"></p>
+        <button type="submit">Create Section</button>
+    </form>
+
+    {% if result %}<pre>{{ result }}</pre>{% endif %}
+</body>
+</html> -->
+
+
+{% load static %}
+
+{% block title %}Create Section | TestRail Manager{% endblock %}
+
+{% block content %}
+<div class="create-section-container">
+    <div class="create-section-card">
+        <div class="create-section-header">
+            <div class="header-icon">
+                <i class="fas fa-folder-plus"></i>
+            </div>
+            <h2>Create Section</h2>
+            <p>Create a new section for Project ID: <strong>{{ project_id }}</strong></p>
+        </div>
+
+        {% if success %}
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> {{ success }}
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{{ action_url }}" class="create-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="name">Section Name <span class="required">*</span></label>
+                <input type="text" name="name" id="name" class="form-control" placeholder="Enter section name" required>
+                <small class="form-text">Give your section a descriptive name</small>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea name="description" id="description" class="form-control" rows="4" placeholder="Enter section description (optional)"></textarea>
+                <small class="form-text">Describe what this section contains</small>
+            </div>
+
+            <div class="form-group">
+                <label for="suite_id">Suite ID <span class="optional">(Optional)</span></label>
+                <input type="number" name="suite_id" id="suite_id" class="form-control" placeholder="Enter suite ID">
+                <small class="form-text">If left empty, the section will be created in the default suite</small>
+            </div>
+
+            <div class="form-group info-box">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>About Sections:</strong>
+                    <p>Sections help organize your test cases into logical groups. You can create nested sections by specifying a parent section ID.</p>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-folder-plus"></i> Create Section
+                </button>
+                <a href="{% url 'testrail_projects' %}" class="btn-cancel">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+
+        {% if result %}
+        <div class="result-section">
+            <h3>API Response</h3>
+            <pre class="api-response">{{ result }}</pre>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .create-section-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 25px;
+        background-color: #f5f7fb;
+    }
+    
+    .create-section-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        width: 100%;
+        max-width: 650px;
+    }
+    
+    .create-section-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .header-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: #fff3e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: #fd7e14;
+        font-size: 28px;
+    }
+    
+    .create-section-header h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .create-section-header p {
+        color: #666;
+        margin: 0;
+    }
+    
+    .create-section-header p strong {
+        color: #fd7e14;
+        background: #fff3e0;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .alert-success {
+        background-color: #e7f6ef;
+        color: #1dbe72;
+        border: 1px solid #b8e6d0;
+    }
+    
+    .alert-error {
+        background-color: #fde8e8;
+        color: #e53e3e;
+        border: 1px solid #f8c6c6;
+    }
+    
+    .create-form {
+        margin-top: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .required {
+        color: #e53e3e;
+    }
+    
+    .optional {
+        color: #6c757d;
+        font-weight: normal;
+        font-size: 12px;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+        font-family: inherit;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #fd7e14;
+        box-shadow: 0 0 0 3px rgba(253, 126, 20, 0.1);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+    }
+    
+    input[type="number"].form-control {
+        -moz-appearance: textfield;
+    }
+    
+    input[type="number"].form-control::-webkit-inner-spin-button,
+    input[type="number"].form-control::-webkit-outer-spin-button {
+        opacity: 0.5;
+    }
+    
+    .form-text {
+        display: block;
+        margin-top: 6px;
+        color: #666;
+        font-size: 13px;
+    }
+    
+    .info-box {
+        background: #fff8f0;
+        padding: 15px;
+        border-radius: 8px;
+        display: flex;
+        gap: 12px;
+        color: #fd7e14;
+        font-size: 14px;
+        margin-bottom: 25px;
+        border-left: 3px solid #fd7e14;
+    }
+    
+    .info-box i {
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+    
+    .info-box div {
+        flex: 1;
+    }
+    
+    .info-box strong {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    
+    .info-box p {
+        margin: 0;
+        color: #666;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    
+    .btn-submit, .btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        border: none;
+        justify-content: center;
+        flex: 1;
+    }
+    
+    .btn-submit {
+        background-color: #fd7e14;
+        color: white;
+    }
+    
+    .btn-submit:hover {
+        background-color: #e66a0e;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(253, 126, 20, 0.3);
+    }
+    
+    .btn-cancel {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .btn-cancel:hover {
+        background-color: #5a6268;
+    }
+    
+    .result-section {
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 1px solid #eaeaea;
+    }
+    
+    .result-section h3 {
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    
+    .api-response {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-size: 13px;
+        font-family: 'Monaco', 'Menlo', monospace;
+        color: #333;
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    @media (max-width: 768px) {
+        .create-section-card {
+            padding: 20px;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .create-section-header h2 {
+            font-size: 20px;
+        }
+        
+        .info-box {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock content %}

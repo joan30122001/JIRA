@@ -12,9 +12,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'testrail',
 ]
 
 MIDDLEWARE = [
@@ -143,6 +147,9 @@ JIRA_SERVER = 'https://ngounouloic675-1763558301952.atlassian.net'
 
 ATLASSIAN_API_TOKEN = os.getenv("ATLASSIAN_API_TOKEN")
 ATLASSIAN_EMAIL = os.getenv("ATLASSIAN_EMAIL")
+
+ASANA_TOKEN = os.getenv("ASANA_TOKEN")
+ASANA_WORKSPACE_GID = os.getenv("ASANA_WORKSPACE_GID")
 
 JIRA_ACCOUNT_ID = '5f6c61591204bb00700426e5'
 

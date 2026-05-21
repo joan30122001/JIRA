@@ -15,4 +15,8 @@ urlpatterns = [
     path('upload_project_with_steps/',
         views.upload_project_with_steps_view,
         name='upload_project_with_steps'),
+
+    path("asana/projects/new/", views.asana_project_create, name="asana_project_create"),
+    path("asana/projects/", views.asana_projects_list, name="asana_projects_list"),
+    # path("asana/projects/sync/", views.asana_projects_sync, name="asana_projects_sync"),
 ]

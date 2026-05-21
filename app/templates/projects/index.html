@@ -1,6 +1,3 @@
-
-
-
 {% extends '_partials/base.html' %}
 {% load static %}
 
@@ -8,7 +5,10 @@
 
 {% block content %}
 <div id="container" class="dashboard-container">
-    
+    <div class="welcome-section">
+        <h1>Welcome to Jira & TestLink Manager</h1>
+        <p class="subtitle">Streamline your QA and project management workflows</p>
+    </div>
 
     <div class="dashboard-cards">
         <!-- Jira Card -->
@@ -59,11 +59,64 @@
                 </form>
             </div>
         </div>
+
+        <!-- Zendesk Card -->
+        <div class="feature-card zendesk-card">
+            <div class="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+            </div>
+            <div class="card-content">
+                <h3>Create Asana Project</h3>
+                <p>Create support projects in Asana with integrated test management workflows</p>
+                <form action="{% url 'asana_project_create' %}" method="get">
+                    <button type="submit" class="btn-primary">
+                        Create Project
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Zendesk Card -->
+        <div class="feature-card zendesk-card">
+            <div class="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <div class="card-content">
+                <h3>Run TestRail Tests</h3>
+                <p>Synchronize your projects steps in TestRail and automatically run test cases</p>
+                <form action="#" method="get">
+                    <button type="submit" class="btn-primary">
+                        Create Project
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
+    
 
     <!-- Recent Activity Section -->
     <div class="recent-activity">
-        <h2>Recent Activity</h2>
+        <div class="activity-header">
+            <h2>Recent Activity</h2>
+            <a href="#" class="view-all">View All</a>
+        </div>
         <div class="activity-list">
             <div class="activity-item">
                 <div class="activity-icon">
@@ -73,8 +126,32 @@
                     </svg>
                 </div>
                 <div class="activity-details">
-                    <p>No recent activity</p>
+                    <p>Welcome to Jira & TestLink Manager</p>
                     <span class="activity-time">Get started by creating your first project</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div class="activity-details">
+                    <p>No recent test executions</p>
+                    <span class="activity-time">Launch your first test to see activity here</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                </div>
+                <div class="activity-details">
+                    <p>No recent projects created</p>
+                    <span class="activity-time">Create your first project to get started</span>
                 </div>
             </div>
         </div>
@@ -84,13 +161,14 @@
 <style>
 .dashboard-container {
     padding: 30px;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
 .welcome-section {
     text-align: center;
     margin-bottom: 40px;
+    padding: 20px;
 }
 
 .welcome-section h1 {
@@ -107,7 +185,7 @@
 
 .dashboard-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 25px;
     margin-bottom: 40px;
 }
@@ -117,7 +195,7 @@
     border-radius: 12px;
     padding: 25px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -125,7 +203,7 @@
 
 .feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .jira-card {
@@ -134,6 +212,10 @@
 
 .testlink-card {
     border-top: 4px solid #f68e9d;
+}
+
+.zendesk-card {
+    border-top: 4px solid #03363D;
 }
 
 .card-icon {
@@ -149,6 +231,7 @@
     font-size: 1.4rem;
     margin-bottom: 12px;
     color: #333;
+    font-weight: 600;
 }
 
 .card-content p {
@@ -169,51 +252,93 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     text-decoration: none;
+    width: 100%;
+    justify-content: center;
 }
 
 .btn-primary:hover {
     background-color: #3b5be3;
+    transform: translateY(-2px);
 }
 
 .recent-activity {
     background: white;
     border-radius: 12px;
-    padding: 25px;
+    padding: 30px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
 }
 
 .recent-activity h2 {
     font-size: 1.4rem;
-    margin-bottom: 20px;
     color: #333;
+    margin: 0;
+    font-weight: 600;
+}
+
+.view-all {
+    color: #4a6cf7;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .activity-item {
     display: flex;
     align-items: flex-start;
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
+    padding: 20px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
 }
 
-.activity-item:last-child {
-    border-bottom: none;
+.activity-item:hover {
+    background: #f0f5ff;
+    transform: translateX(5px);
 }
 
 .activity-icon {
     margin-right: 15px;
     color: #777;
+    flex-shrink: 0;
+}
+
+.activity-details {
+    flex: 1;
 }
 
 .activity-details p {
     margin: 0 0 5px 0;
-    color: #444;
+    color: #333;
+    font-weight: 500;
 }
 
 .activity-time {
     font-size: 0.85rem;
-    color: #888;
+    color: #666;
+}
+
+@media (max-width: 1200px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
@@ -223,6 +348,17 @@
     
     .dashboard-cards {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .welcome-section h1 {
+        font-size: 1.8rem;
+    }
+    
+    .activity-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
 }
 </style>

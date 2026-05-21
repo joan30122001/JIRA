@@ -1,0 +1,312 @@
+{% extends '_partials/base.html' %}
+
+{% load static %}
+
+{% block title %}TestRail Projects | Jira & TestLink Manager{% endblock %}
+
+{% block content %}
+<div class="projects-container">
+    <div class="projects-header">
+        <h2>TestRail Projects</h2>
+        <a href="{% url 'testrail_create_project' %}" class="create-btn">
+            <i class="fas fa-plus-circle"></i> Create Project
+        </a>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-error">
+        <i class="fas fa-exclamation-triangle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    {% if projects %}
+    <div class="projects-grid">
+        {% for project in projects %}
+        <div class="project-card">
+            <div class="card-header">
+                <div class="project-icon">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <div class="project-info">
+                    <h3>{{ project.name }}</h3>
+                    <span class="project-id">ID: {{ project.id }}</span>
+                </div>
+            </div>
+            
+            <div class="project-actions">
+                <a href="{% url 'testrail_create_milestone' project.id %}" class="btn-milestone">
+                    <i class="fas fa-flag-checkered"></i> Create Milestone
+                </a>
+                <a href="{% url 'testrail_suites' project.id %}" class="btn-suites">
+                    <i class="fas fa-layer-group"></i> Suites
+                </a>
+                <a href="{% url 'testrail_create_section' project.id %}" class="btn-section">
+                    <i class="fas fa-folder-plus"></i> Create Section
+                </a>
+                <a href="{% url 'testrail_create_run' project.id %}" class="btn-run">
+                    <i class="fas fa-play-circle"></i> Create Run
+                </a>
+                <a href="{% url 'testrail_create_plan' project.id %}" class="btn-plan">
+                    <i class="fas fa-tasks"></i> Create Plan
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-flask"></i>
+        </div>
+        <h3>No TestRail Projects Found</h3>
+        <p>You haven't created any TestRail projects yet. Get started by creating your first project.</p>
+        <a href="{% url 'testrail_create_project' %}" class="create-btn">
+            <i class="fas fa-plus-circle"></i> Create Your First Project
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .projects-container {
+        padding: 25px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .projects-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    
+    .projects-header h2 {
+        font-size: 24px;
+        color: #333;
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .create-btn {
+        background-color: #1dbe72;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    
+    .create-btn:hover {
+        background-color: #18a463;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .alert-error {
+        background-color: #fde8e8;
+        color: #e53e3e;
+        border: 1px solid #f8c6c6;
+    }
+    
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 25px;
+    }
+    
+    .project-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-left: 4px solid #6F42C1;
+    }
+    
+    .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    
+    .project-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        background: #f3e8ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6F42C1;
+        font-size: 20px;
+    }
+    
+    .project-info {
+        flex: 1;
+    }
+    
+    .project-info h3 {
+        font-size: 18px;
+        margin: 0 0 5px 0;
+        color: #333;
+        font-weight: 600;
+    }
+    
+    .project-id {
+        display: inline-block;
+        background: #f3e8ff;
+        color: #6F42C1;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .project-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .project-actions a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        text-align: center;
+    }
+    
+    .btn-milestone {
+        background: #6F42C1;
+        color: white;
+        border: none;
+    }
+    
+    .btn-milestone:hover {
+        background: #5a32a3;
+        transform: translateY(-2px);
+    }
+    
+    .btn-suites {
+        background: #17a2b8;
+        color: white;
+        border: none;
+    }
+    
+    .btn-suites:hover {
+        background: #138496;
+        transform: translateY(-2px);
+    }
+    
+    .btn-section {
+        background: #fd7e14;
+        color: white;
+        border: none;
+    }
+    
+    .btn-section:hover {
+        background: #e66a0e;
+        transform: translateY(-2px);
+    }
+    
+    .btn-run {
+        background: #1dbe72;
+        color: white;
+        border: none;
+    }
+    
+    .btn-run:hover {
+        background: #18a463;
+        transform: translateY(-2px);
+    }
+    
+    .btn-plan {
+        background: #4a6cf7;
+        color: white;
+        border: none;
+    }
+    
+    .btn-plan:hover {
+        background: #3b5be3;
+        transform: translateY(-2px);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .empty-icon {
+        font-size: 64px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        font-size: 20px;
+        color: #333;
+        margin: 0 0 10px 0;
+    }
+    
+    .empty-state p {
+        color: #666;
+        margin: 0 0 25px 0;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    @media (max-width: 768px) {
+        .projects-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .projects-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .project-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock content %}
